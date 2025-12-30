@@ -1,0 +1,66 @@
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Paciente } from '../../pacientes/entities/paciente.entity';
+import { Doctor } from '../../doctors/entities/doctor.entity';
+import { Proforma } from '../../proformas/entities/proforma.entity';
+import { User } from '../../users/entities/user.entity';
+
+@Entity('agenda')
+export class Agenda {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({ type: 'date' })
+    fecha: string;
+
+    @Column({ type: 'time' })
+    hora: string;
+
+    @Column({ type: 'int' })
+    duracion: number; // en minutos
+
+    @Column({ type: 'int' })
+    consultorio: number; // 1 - 5
+
+    @Column({ nullable: true })
+    pacienteId: number;
+
+    @ManyToOne(() => Paciente, { nullable: true })
+    @JoinColumn({ name: 'pacienteId' })
+    paciente: Paciente;
+
+    @Column()
+    doctorId: number;
+
+    @ManyToOne(() => Doctor)
+    @JoinColumn({ name: 'doctorId' })
+    doctor: Doctor;
+
+    @Column({ nullable: true })
+    proformaId: number;
+
+    @ManyToOne(() => Proforma, { nullable: true })
+    @JoinColumn({ name: 'proformaId' })
+    proforma: Proforma;
+
+    @Column({ type: 'text', nullable: true })
+    tratamiento: string;
+
+    @Column()
+    usuarioId: number; // Quien agendó
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
+
+    @CreateDateColumn({ name: 'fecha_agendado' })
+    fechaAgendado: Date;
+
+    // Hora agendado is implicitly part of fecha_agendado timestamp, but if specific column needed:
+    // We will rely on fechaAgendado being a full timestamp.
+
+    @Column({ default: 'agendado' })
+    estado: string;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+}
