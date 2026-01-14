@@ -29,6 +29,9 @@ export class Pago {
     @Column('decimal', { precision: 10, scale: 2 })
     monto: number;
 
+    @Column('decimal', { precision: 10, scale: 2, nullable: true })
+    monto_comision: number;
+
     @Column('decimal', { precision: 10, scale: 2, default: 0 })
     tc: number;
 

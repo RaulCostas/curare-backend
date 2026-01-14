@@ -1,32 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { HistoriaClinica } from '../../historia_clinica/entities/historia_clinica.entity';
-import { Inventario } from '../../inventario/entities/inventario.entity';
 import { User } from '../../users/entities/user.entity';
+import { MaterialUtilizadoDetalle } from './material_utilizado_detalle.entity';
 
 @Entity('material_utilizado')
 export class MaterialUtilizado {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true })
+    @Column()
     historiaClinicaId: number;
 
     @ManyToOne(() => HistoriaClinica)
     @JoinColumn({ name: 'historiaClinicaId' })
     historiaClinica: HistoriaClinica;
 
-    @Column()
-    inventarioId: number;
-
-    @ManyToOne(() => Inventario)
-    @JoinColumn({ name: 'inventarioId' })
-    inventario: Inventario;
-
     @Column({ type: 'date' })
     fecha: Date;
-
-    @Column()
-    cantidad: string; // Allows fractional values like "1/4", "1/2", "1", "2", etc.
 
     @Column({ type: 'text', nullable: true })
     observaciones: string;
@@ -37,6 +27,12 @@ export class MaterialUtilizado {
     @ManyToOne(() => User)
     @JoinColumn({ name: 'userId' })
     user: User;
+
+    @OneToMany(() => MaterialUtilizadoDetalle, (detalle) => detalle.materialUtilizado, {
+        cascade: true,
+        eager: true
+    })
+    detalles: MaterialUtilizadoDetalle[];
 
     @CreateDateColumn()
     createdAt: Date;

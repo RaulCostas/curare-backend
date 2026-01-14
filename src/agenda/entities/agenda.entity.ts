@@ -3,6 +3,7 @@ import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Doctor } from '../../doctors/entities/doctor.entity';
 import { Proforma } from '../../proformas/entities/proforma.entity';
 import { User } from '../../users/entities/user.entity';
+import { Personal } from '../../personal/entities/personal.entity';
 
 @Entity('agenda')
 export class Agenda {
@@ -45,6 +46,13 @@ export class Agenda {
     @Column({ type: 'text', nullable: true })
     tratamiento: string;
 
+    @Column({ nullable: true })
+    asistenteId: number;
+
+    @ManyToOne(() => Personal, { nullable: true })
+    @JoinColumn({ name: 'asistenteId' })
+    asistente: Personal;
+
     @Column()
     usuarioId: number; // Quien agendó
 
@@ -60,6 +68,9 @@ export class Agenda {
 
     @Column({ default: 'agendado' })
     estado: string;
+
+    @Column({ type: 'text', nullable: true })
+    motivoCancelacion: string;
 
     @UpdateDateColumn()
     updatedAt: Date;

@@ -23,17 +23,37 @@ export class AgendaService {
         }
     }
 
-    async findAll(date?: string): Promise<Agenda[]> {
+    async findAll(date?: string, fechaInicio?: string, fechaFinal?: string, pacienteId?: number, usuarioId?: number): Promise<Agenda[]> {
         const query = this.agendaRepository.createQueryBuilder('agenda')
             .leftJoinAndSelect('agenda.paciente', 'paciente')
             .leftJoinAndSelect('paciente.categoria', 'categoria')
             .leftJoinAndSelect('agenda.doctor', 'doctor')
             .leftJoinAndSelect('agenda.proforma', 'proforma')
             .leftJoinAndSelect('agenda.usuario', 'usuario')
+            .leftJoinAndSelect('agenda.asistente', 'asistente')
+            .leftJoinAndSelect('asistente.personalTipo', 'personalTipo')
             .where("agenda.estado != 'eliminado'"); // Filter out deleted
 
         if (date) {
             query.andWhere('agenda.fecha = :date', { date });
+        }
+
+        // Filter by date range (fechaAgendado)
+        if (fechaInicio) {
+            query.andWhere('agenda.fechaAgendado >= :fechaInicio', { fechaInicio });
+        }
+        if (fechaFinal) {
+            query.andWhere('agenda.fechaAgendado <= :fechaFinal', { fechaFinal });
+        }
+
+        // Filter by patient
+        if (pacienteId) {
+            query.andWhere('agenda.pacienteId = :pacienteId', { pacienteId });
+        }
+
+        // Filter by user who created the appointment
+        if (usuarioId) {
+            query.andWhere('agenda.usuarioId = :usuarioId', { usuarioId });
         }
 
         query.orderBy('agenda.hora', 'ASC');
@@ -44,7 +64,7 @@ export class AgendaService {
     async findAllByPaciente(pacienteId: number): Promise<Agenda[]> {
         return await this.agendaRepository.find({
             where: { pacienteId }, // Return all history for this patient
-            relations: ['paciente', 'doctor', 'proforma', 'usuario'],
+            relations: ['paciente', 'doctor', 'proforma', 'usuario', 'asistente', 'asistente.personalTipo'],
             order: { fecha: 'DESC', hora: 'ASC' }
         });
     }
@@ -52,7 +72,7 @@ export class AgendaService {
     async findOne(id: number): Promise<Agenda> {
         const cita = await this.agendaRepository.findOne({
             where: { id },
-            relations: ['paciente', 'doctor', 'proforma', 'usuario']
+            relations: ['paciente', 'doctor', 'proforma', 'usuario', 'asistente', 'asistente.personalTipo']
         });
         if (!cita) {
             throw new NotFoundException(`Cita #${id} not found`);
@@ -79,8 +99,26 @@ export class AgendaService {
     async findAllByDoctor(doctorId: number): Promise<Agenda[]> {
         return await this.agendaRepository.find({
             where: { doctorId, estado: 'agendado' } as any, // Using 'as any' to bypass potential type strictness if doctorId field name varies, but typically it matches entity column
-            relations: ['paciente', 'doctor', 'proforma', 'usuario'],
+            relations: ['paciente', 'doctor', 'proforma', 'usuario', 'asistente', 'asistente.personalTipo'],
             order: { fecha: 'ASC', hora: 'ASC' }
         });
+    }
+
+    async deleteAll(): Promise<{ message: string; deletedCount: number }> {
+        try {
+            // Count records before deletion
+            const count = await this.agendaRepository.count();
+
+            // Delete all records using TRUNCATE which also resets the sequence
+            await this.agendaRepository.query('TRUNCATE TABLE agenda RESTART IDENTITY CASCADE');
+
+            return {
+                message: `Todos los registros de la tabla Agenda han sido eliminados y el ID ha sido reiniciado`,
+                deletedCount: count
+            };
+        } catch (error) {
+            console.error('Error deleting all agenda records:', error);
+            throw new InternalServerErrorException(`Error al eliminar registros: ${error.message}`);
+        }
     }
 }

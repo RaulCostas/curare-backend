@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { PersonalTipo } from '../../personal_tipo/entities/personal_tipo.entity';
 
 @Entity('personal')
 export class Personal {
@@ -31,6 +32,13 @@ export class Personal {
 
     @Column({ type: 'date' })
     fecha_ingreso: Date;
+
+    @Column({ nullable: true })
+    personal_tipo_id: number;
+
+    @ManyToOne(() => PersonalTipo, { eager: true })
+    @JoinColumn({ name: 'personal_tipo_id' })
+    personalTipo: PersonalTipo;
 
     @Column({ default: 'activo' })
     estado: string;

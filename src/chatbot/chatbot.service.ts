@@ -45,7 +45,8 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
     async onModuleInit() {
         // Initialize connection on startup if session exists
         // or wait for manual trigger via API
-        this.initialize();
+        // this.initialize(); // DISABLED TO PREVENT OOM IN DEV
+        console.log('Chatbot auto-start disabled to prevent memory leaks during debugging.');
     }
 
     async onModuleDestroy() {

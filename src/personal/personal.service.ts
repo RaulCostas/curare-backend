@@ -13,7 +13,11 @@ export class PersonalService {
     ) { }
 
     create(createPersonalDto: CreatePersonalDto) {
-        const personal = this.personalRepository.create(createPersonalDto);
+        const { personalTipoId, ...rest } = createPersonalDto;
+        const personal = this.personalRepository.create({
+            ...rest,
+            personal_tipo_id: personalTipoId,
+        });
         return this.personalRepository.save(personal);
     }
 
@@ -28,6 +32,7 @@ export class PersonalService {
             skip,
             take: limit,
             order: { nombre: 'ASC', paterno: 'ASC', materno: 'ASC' },
+            relations: ['personalTipo'],
         });
 
         return {
@@ -65,7 +70,25 @@ export class PersonalService {
     }
 
     update(id: number, updatePersonalDto: UpdatePersonalDto) {
-        return this.personalRepository.update(id, updatePersonalDto);
+        console.log('=== UPDATE PERSONAL DEBUG ===');
+        console.log('ID:', id);
+        console.log('Received DTO:', updatePersonalDto);
+
+        const { personalTipoId, personalTipo, ...rest } = updatePersonalDto as any;
+        const updateData: any = { ...rest };
+
+        // Only add personal_tipo_id if personalTipoId is present in the DTO
+        if ('personalTipoId' in updatePersonalDto) {
+            updateData.personal_tipo_id = personalTipoId || null;
+            console.log('personalTipoId found in DTO:', personalTipoId);
+        } else {
+            console.log('personalTipoId NOT in DTO');
+        }
+
+        console.log('Final updateData:', updateData);
+        console.log('=== END DEBUG ===');
+
+        return this.personalRepository.update(id, updateData);
     }
 
     remove(id: number) {

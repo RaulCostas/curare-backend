@@ -34,8 +34,8 @@ export class CreateHistoriaClinicaDto {
     doctorId?: number;
 
     @IsOptional()
-    @IsString()
-    asistente?: string;
+    @IsNumber()
+    personalId?: number;
 
     @IsNotEmpty()
     @IsNumber()

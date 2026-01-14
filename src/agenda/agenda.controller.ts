@@ -23,8 +23,14 @@ export class AgendaController {
     }
 
     @Get()
-    findAll(@Query('date') date?: string) {
-        return this.agendaService.findAll(date);
+    findAll(
+        @Query('date') date?: string,
+        @Query('fechaInicio') fechaInicio?: string,
+        @Query('fechaFinal') fechaFinal?: string,
+        @Query('pacienteId') pacienteId?: string,
+        @Query('usuarioId') usuarioId?: string,
+    ) {
+        return this.agendaService.findAll(date, fechaInicio, fechaFinal, pacienteId ? +pacienteId : undefined, usuarioId ? +usuarioId : undefined);
     }
 
     @Get(':id')
@@ -40,6 +46,11 @@ export class AgendaController {
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateDto: UpdateAgendaDto) {
         return this.agendaService.update(+id, updateDto);
+    }
+
+    @Delete('all/records')
+    deleteAll() {
+        return this.agendaService.deleteAll();
     }
 
     @Delete(':id')

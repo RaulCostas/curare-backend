@@ -42,4 +42,12 @@ export class CreateAgendaDto {
     @IsOptional()
     @IsString()
     tratamiento?: string;
+
+    @IsOptional()
+    @IsNumber()
+    asistenteId?: number;
+
+    @IsOptional()
+    @IsString()
+    motivoCancelacion?: string;
 }

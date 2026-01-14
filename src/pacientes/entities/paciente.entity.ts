@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { CategoriaPaciente } from '../../categoria_paciente/entities/categoria_paciente.entity';
 import { FichaMedica } from '../../ficha_medica/entities/ficha_medica.entity';
 import { HistoriaClinica } from '../../historia_clinica/entities/historia_clinica.entity';
@@ -11,6 +11,9 @@ export class Paciente {
 
     @Column({ type: 'date', default: () => 'CURRENT_DATE' })
     fecha: string;
+
+    @Column({ nullable: true })
+    access_id: string;
 
     @Column()
     paterno: string;
@@ -86,8 +89,14 @@ export class Paciente {
     @JoinColumn()
     fichaMedica: FichaMedica;
 
-    @Column()
+    @Column({ nullable: true })
     nomenclatura: string;
+
+    @Column({ nullable: true })
+    tipo_paciente: string;
+
+    @Column({ nullable: true })
+    motivo: string;
 
     @Column({ default: 'activo' })
     estado: string;
@@ -100,4 +109,10 @@ export class Paciente {
 
     @OneToMany('Propuesta', (propuesta: any) => propuesta.paciente)
     propuestas: any[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

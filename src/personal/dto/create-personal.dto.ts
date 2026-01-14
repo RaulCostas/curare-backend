@@ -1,4 +1,4 @@
-import { IsString, IsDateString, IsOptional } from 'class-validator';
+import { IsString, IsDateString, IsOptional, IsNumber } from 'class-validator';
 
 export class CreatePersonalDto {
     @IsString()
@@ -27,6 +27,10 @@ export class CreatePersonalDto {
 
     @IsDateString()
     fecha_ingreso: string;
+
+    @IsOptional()
+    @IsNumber()
+    personalTipoId?: number;
 
     @IsString()
     @IsOptional()

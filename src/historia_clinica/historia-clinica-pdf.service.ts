@@ -113,7 +113,7 @@ export class HistoriaClinicaPdfService {
                 record.observaciones || '-',
                 record.cantidad?.toString() || '0',
                 record.doctor ? `${record.doctor.paterno} ${record.doctor.nombre}` : '-',
-                record.asistente || '-',
+                record.personal ? `${record.personal.paterno} ${record.personal.nombre}` : '-',
                 record.estadoTratamiento || '-'
             ])
         ];

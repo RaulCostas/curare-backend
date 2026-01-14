@@ -7,12 +7,14 @@ import { AuthModule } from './auth/auth.module';
 import { DoctorsModule } from './doctors/doctors.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
 import { PersonalModule } from './personal/personal.module';
+import { PersonalTipoModule } from './personal_tipo/personal_tipo.module';
 import { EspecialidadModule } from './especialidad/especialidad.module';
 import { ArancelModule } from './arancel/arancel.module';
 import { User } from './users/entities/user.entity';
 import { Doctor } from './doctors/entities/doctor.entity';
 import { Proveedor } from './proveedores/entities/proveedor.entity';
 import { Personal } from './personal/entities/personal.entity';
+import { PersonalTipo } from './personal_tipo/entities/personal_tipo.entity';
 import { Especialidad } from './especialidad/entities/especialidad.entity';
 import { Arancel } from './arancel/entities/arancel.entity';
 import { EgresosModule } from './egresos/egresos.module';
@@ -95,6 +97,22 @@ import { Receta } from './receta/entities/receta.entity';
 import { RecetaDetalle } from './receta/entities/receta-detalle.entity';
 import { MaterialUtilizadoModule } from './material_utilizado/material_utilizado.module';
 import { MaterialUtilizado } from './material_utilizado/entities/material_utilizado.entity';
+import { MaterialUtilizadoDetalle } from './material_utilizado/entities/material_utilizado_detalle.entity';
+import { RecordatorioModule } from './recordatorio/recordatorio.module';
+import { Recordatorio } from './recordatorio/entities/recordatorio.entity';
+import { MusicaModule } from './musica/musica.module';
+import { Musica } from './musica/entities/musica.entity';
+import { TelevisionModule } from './television/television.module';
+import { Television } from './television/entities/television.entity';
+import { PacienteMusica } from './pacientes/entities/paciente-musica.entity';
+import { PacienteTelevision } from './pacientes/entities/paciente-television.entity';
+import { RecordatorioTratamientoModule } from './recordatorio-tratamiento/recordatorio-tratamiento.module';
+import { RecordatorioTratamiento } from './recordatorio-tratamiento/entities/recordatorio-tratamiento.entity';
+import { RecordatorioPlanModule } from './recordatorio_plan/recordatorio-plan.module';
+import { RecordatorioPlan } from './recordatorio_plan/entities/recordatorio-plan.entity';
+import { ContactosModule } from './contactos/contactos.module';
+import { Contacto } from './contactos/entities/contacto.entity';
+import { BackupModule } from './backup/backup.module';
 
 @Module({
   imports: [
@@ -110,6 +128,7 @@ import { MaterialUtilizado } from './material_utilizado/entities/material_utiliz
         Doctor,
         Proveedor,
         Personal,
+        PersonalTipo,
         Especialidad,
         Arancel,
         Egreso,
@@ -151,6 +170,16 @@ import { MaterialUtilizado } from './material_utilizado/entities/material_utiliz
         PagosDoctores,
         Receta,
         MaterialUtilizado,
+        MaterialUtilizadoDetalle,
+        Recordatorio,
+        Musica,
+        Television,
+        PacienteMusica,
+        PacienteTelevision,
+        PacienteTelevision,
+        RecordatorioTratamiento,
+        RecordatorioPlan,
+        Contacto,
       ],
       synchronize: true,
     }),
@@ -159,6 +188,7 @@ import { MaterialUtilizado } from './material_utilizado/entities/material_utiliz
     DoctorsModule,
     ProveedoresModule,
     PersonalModule,
+    PersonalTipoModule,
     EspecialidadModule,
     ArancelModule,
     EgresosModule,
@@ -197,6 +227,13 @@ import { MaterialUtilizado } from './material_utilizado/entities/material_utiliz
     UtilidadesModule,
     RecetaModule,
     MaterialUtilizadoModule,
+    RecordatorioModule,
+    MusicaModule,
+    TelevisionModule,
+    RecordatorioTratamientoModule,
+    RecordatorioPlanModule,
+    ContactosModule,
+    BackupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

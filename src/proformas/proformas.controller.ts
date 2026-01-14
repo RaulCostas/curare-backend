@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -16,8 +16,8 @@ export class ProformasController {
   }
 
   @Get()
-  findAll() {
-    return this.proformasService.findAll();
+  findAll(@Query('limit') limit?: number, @Query('page') page?: number) {
+    return this.proformasService.findAll(limit, page);
   }
 
   @Get(':id')

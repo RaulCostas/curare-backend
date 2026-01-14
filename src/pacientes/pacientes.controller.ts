@@ -61,4 +61,25 @@ export class PacientesController {
     remove(@Param('id') id: string) {
         return this.pacientesService.remove(+id);
     }
+    // Endpoints para Música
+    @Get(':id/musica')
+    getPacienteMusica(@Param('id') id: string) {
+        return this.pacientesService.getPacienteMusica(+id);
+    }
+
+    @Post(':id/musica')
+    savePacienteMusica(@Param('id') id: string, @Body() body: { musicaIds: number[] }) {
+        return this.pacientesService.savePacienteMusica(+id, body.musicaIds);
+    }
+
+    // Endpoints para Televisión
+    @Get(':id/television')
+    getPacienteTelevision(@Param('id') id: string) {
+        return this.pacientesService.getPacienteTelevision(+id);
+    }
+
+    @Post(':id/television')
+    savePacienteTelevision(@Param('id') id: string, @Body() body: { televisionIds: number[] }) {
+        return this.pacientesService.savePacienteTelevision(+id, body.televisionIds);
+    }
 }

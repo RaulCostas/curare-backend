@@ -4,12 +4,18 @@ import { Repository, ILike } from 'typeorm';
 import { Paciente } from './entities/paciente.entity';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
 import { UpdatePacienteDto } from './dto/update-paciente.dto';
+import { PacienteMusica } from './entities/paciente-musica.entity';
+import { PacienteTelevision } from './entities/paciente-television.entity';
 
 @Injectable()
 export class PacientesService {
     constructor(
         @InjectRepository(Paciente)
         private pacientesRepository: Repository<Paciente>,
+        @InjectRepository(PacienteMusica)
+        private pacienteMusicaRepository: Repository<PacienteMusica>,
+        @InjectRepository(PacienteTelevision)
+        private pacienteTelevisionRepository: Repository<PacienteTelevision>,
     ) { }
 
     async create(createPacienteDto: CreatePacienteDto): Promise<Paciente> {
@@ -20,20 +26,29 @@ export class PacientesService {
 
     async findAll(page: number = 1, limit: number = 10, search: string = ''): Promise<{ data: Paciente[], total: number, page: number, limit: number, totalPages: number }> {
         const skip = (page - 1) * limit;
-        const [data, total] = await this.pacientesRepository.findAndCount({
-            where: [
-                { nombre: ILike(`%${search}%`) },
-                { paterno: ILike(`%${search}%`) },
-                { materno: ILike(`%${search}%`) }
-            ],
-            order: {
-                paterno: 'ASC',
-                materno: 'ASC',
-                nombre: 'ASC'
-            },
-            take: limit,
-            skip: skip,
-        });
+
+        const queryBuilder = this.pacientesRepository.createQueryBuilder('paciente');
+
+        // Include relations that were eager
+        queryBuilder.leftJoinAndSelect('paciente.categoria', 'categoria');
+        queryBuilder.leftJoinAndSelect('paciente.fichaMedica', 'fichaMedica');
+
+        if (search) {
+            const searchTerm = `%${search}%`;
+            queryBuilder.where(
+                "(paciente.nombre ILIKE :search OR paciente.paterno ILIKE :search OR paciente.materno ILIKE :search OR CONCAT(paciente.nombre, ' ', paciente.paterno, ' ', paciente.materno) ILIKE :search OR CONCAT(paciente.paterno, ' ', paciente.materno, ' ', paciente.nombre) ILIKE :search)",
+                { search: searchTerm }
+            );
+        }
+
+        queryBuilder
+            .orderBy('paciente.paterno', 'ASC')
+            .addOrderBy('paciente.materno', 'ASC')
+            .addOrderBy('paciente.nombre', 'ASC')
+            .skip(skip)
+            .take(limit);
+
+        const [data, total] = await queryBuilder.getManyAndCount();
 
         return {
             data,
@@ -241,4 +256,48 @@ export class PacientesService {
 
         return monthlyStats;
     }
+    // M�todos para M�sica
+    async getPacienteMusica(pacienteId: number): Promise<number[]> {
+        const relaciones = await this.pacienteMusicaRepository.find({
+            where: { pacienteId }
+        });
+        return relaciones.map(r => r.musicaId);
+    }
+
+    async savePacienteMusica(pacienteId: number, musicaIds: number[]): Promise<void> {
+        // Eliminar relaciones existentes
+        await this.pacienteMusicaRepository.delete({ pacienteId });
+
+        // Crear nuevas relaciones
+        if (musicaIds && musicaIds.length > 0) {
+            const relaciones = musicaIds.map(musicaId => ({
+                pacienteId,
+                musicaId
+            }));
+            await this.pacienteMusicaRepository.save(relaciones);
+        }
+    }
+
+    // M�todos para Televisi�n
+    async getPacienteTelevision(pacienteId: number): Promise<number[]> {
+        const relaciones = await this.pacienteTelevisionRepository.find({
+            where: { pacienteId }
+        });
+        return relaciones.map(r => r.televisionId);
+    }
+
+    async savePacienteTelevision(pacienteId: number, televisionIds: number[]): Promise<void> {
+        // Eliminar relaciones existentes
+        await this.pacienteTelevisionRepository.delete({ pacienteId });
+
+        // Crear nuevas relaciones
+        if (televisionIds && televisionIds.length > 0) {
+            const relaciones = televisionIds.map(televisionId => ({
+                pacienteId,
+                televisionId
+            }));
+            await this.pacienteTelevisionRepository.save(relaciones);
+        }
+    }
+
 }

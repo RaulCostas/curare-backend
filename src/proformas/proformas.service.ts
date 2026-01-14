@@ -99,10 +99,12 @@ export class ProformasService {
     }
   }
 
-  async findAll() {
+  async findAll(limit: number = 20, page: number = 1) {
     return this.proformaRepository.find({
       relations: ['paciente', 'usuario', 'usuarioAprobado', 'detalles', 'detalles.arancel'],
-      order: { fecha: 'DESC' }
+      order: { fecha: 'DESC' },
+      take: limit,
+      skip: (page - 1) * limit
     });
   }
 

@@ -20,48 +20,21 @@ export class DoctorsService {
         return this.doctorsRepository.save(doctor);
     }
 
-    async getStatistics(year: number, month: number, status: string): Promise<any[]> {
-        const query = this.doctorsRepository.createQueryBuilder('doctor')
-            .leftJoin(
-                'historia_clinica',
-                'hc',
-                'hc.doctorId = doctor.id AND hc.estadoTratamiento = :estadoTrat',
-                { estadoTrat: 'terminado' }
-            )
-            .select([
-                'doctor.id AS "id"',
-                'doctor.nombre AS "nombre"',
-                'doctor.paterno AS "paterno"',
-                'doctor.materno AS "materno"',
-                'COALESCE(SUM(hc.precio), 0) AS "totalGenerado"'
-            ])
-            .groupBy('doctor.id')
-            .addGroupBy('doctor.nombre')
-            .addGroupBy('doctor.paterno')
-            .addGroupBy('doctor.materno')
-            .orderBy('"totalGenerado"', 'DESC');
-
-        // Apply Month/Year filter to the JOIN condition or WHERE
-        // Since we want ALL doctors even if 0, we put filter in ON clause of Left Join, 
-        // BUT TypeORM query builder leftJoin syntax with complex conditions including parameters is tricky.
-        // Easier: Use a subquery or join with specific conditions in the ON clause.
-        // Let's refine the leftJoin above. The condition is strict on the join.
-        // We need to filter by date.
-        // Postgres: EXTRACT(YEAR FROM hc.fecha) = :year
-
+    async getStatistics(fechaInicio: string, fechaFinal: string, status: string): Promise<any[]> {
+        // Build date condition for the join
         let dateCondition = 'hc.estadoTratamiento = :estadoTrat';
         const params: any = { estadoTrat: 'terminado' };
 
-        if (year) {
-            dateCondition += ' AND EXTRACT(YEAR FROM hc.fecha) = :year';
-            params.year = year;
+        if (fechaInicio) {
+            dateCondition += ' AND hc.fecha >= :fechaInicio';
+            params.fechaInicio = fechaInicio;
         }
-        if (month) {
-            dateCondition += ' AND EXTRACT(MONTH FROM hc.fecha) = :month';
-            params.month = month;
+        if (fechaFinal) {
+            dateCondition += ' AND hc.fecha <= :fechaFinal';
+            params.fechaFinal = fechaFinal;
         }
 
-        // Re-construct query with dynamic date condition in join
+        // Build query with join to proforma_detalle to get discount
         const qb = this.doctorsRepository.createQueryBuilder('doctor')
             .leftJoin(
                 'historia_clinica',
@@ -69,12 +42,19 @@ export class DoctorsService {
                 `hc.doctorId = doctor.id AND ${dateCondition}`,
                 params
             )
+            .leftJoin(
+                'proforma_detalle',
+                'pd',
+                'pd.id = hc.proformaDetalleId'
+            )
             .select([
                 'doctor.id AS "id"',
                 'doctor.nombre AS "nombre"',
                 'doctor.paterno AS "paterno"',
                 'doctor.materno AS "materno"',
-                'COALESCE(SUM(hc.precio), 0) AS "totalGenerado"'
+                // Calculate total as price minus percentage discount
+                // Formula: precio - (precio * descuento / 100)
+                'COALESCE(SUM(hc.precio - (hc.precio * COALESCE(pd.descuento, 0) / 100)), 0) AS "totalGenerado"'
             ])
             .groupBy('doctor.id')
             .addGroupBy('doctor.nombre')

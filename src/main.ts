@@ -9,6 +9,6 @@ async function bootstrap() {
   app.enableCors();
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Backend is running on: ${await app.getUrl()}`);
-  console.log('Force Restart Triggered: ' + new Date().toISOString());
+  console.log('Force Restart Triggered 2: ' + new Date().toISOString());
 }
 bootstrap();

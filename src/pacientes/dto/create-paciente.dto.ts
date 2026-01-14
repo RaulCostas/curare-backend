@@ -75,9 +75,15 @@ export class CreatePacienteDto {
     idCategoria?: number;
 
     @IsString()
+    @IsOptional()
     tipo_paciente: string;
 
     @IsString()
+    @IsOptional()
+    motivo: string;
+
+    @IsString()
+    @IsOptional()
     nomenclatura: string;
 
     @IsString()

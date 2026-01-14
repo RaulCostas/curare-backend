@@ -21,6 +21,10 @@ export class CreatePagoDto {
     @IsNumber()
     tc: number;
 
+    @IsOptional()
+    @IsNumber()
+    monto_comision?: number;
+
     @IsNotEmpty()
     @IsEnum(['Bolivianos', 'Dólares'])
     moneda: string;

@@ -14,13 +14,13 @@ export class DoctorsController {
 
     @Get('statistics')
     getStatistics(
-        @Query('year') year: string,
-        @Query('month') month: string,
+        @Query('fechaInicio') fechaInicio: string,
+        @Query('fechaFinal') fechaFinal: string,
         @Query('status') status: string,
     ) {
         return this.doctorsService.getStatistics(
-            year ? +year : new Date().getFullYear(),
-            month ? +month : new Date().getMonth() + 1,
+            fechaInicio,
+            fechaFinal,
             status
         );
     }

@@ -5,6 +5,7 @@ import { Especialidad } from '../../especialidad/entities/especialidad.entity';
 import { Proforma } from '../../proformas/entities/proforma.entity';
 import { ProformaDetalle } from '../../proformas/entities/proforma-detalle.entity';
 import { PagosDetalleDoctores } from '../../pagos_doctores/entities/pagos-detalle-doctores.entity';
+import { Personal } from '../../personal/entities/personal.entity';
 
 @Entity('historia_clinica')
 export class HistoriaClinica {
@@ -52,7 +53,11 @@ export class HistoriaClinica {
     doctor: Doctor;
 
     @Column({ nullable: true })
-    asistente: string;
+    personalId: number;
+
+    @ManyToOne(() => Personal, { nullable: true, eager: true })
+    @JoinColumn({ name: 'personalId' })
+    personal: Personal;
 
     @Column({ type: 'int', default: 0 })
     hoja: number;

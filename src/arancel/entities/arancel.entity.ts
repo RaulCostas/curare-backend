@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Especialidad } from '../../especialidad/entities/especialidad.entity';
 
 @Entity('arancel')
@@ -27,4 +27,10 @@ export class Arancel {
     @ManyToOne(() => Especialidad)
     @JoinColumn({ name: 'idEspecialidad' })
     especialidad: Especialidad;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 }
